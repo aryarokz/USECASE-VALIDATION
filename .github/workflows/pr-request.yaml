@@ -1,0 +1,41 @@
+name: Enforce PR Branch Naming Rules
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+jobs:
+  validate-branch-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR branch naming rules
+        run: |
+          echo "Source Branch: ${{ github.head_ref }}"
+          echo "Target Branch: ${{ github.base_ref }}"
+
+          SOURCE_BRANCH="${{ github.head_ref }}"
+          TARGET_BRANCH="${{ github.base_ref }}"
+
+          # Use Case 1: PR to master or release/XXXX must come from story/RBAUAA-XXXXX or release/XXXXX
+          if [[ "$TARGET_BRANCH" == "master" || "$TARGET_BRANCH" =~ ^release/[0-9]+$ ]]; then
+            if [[ "$SOURCE_BRANCH" =~ ^story/RBAUAA-[0-9]+$ || "$SOURCE_BRANCH" =~ ^release/[0-9]+$ ]]; then
+              echo "✅ Use Case 1 passed."
+            else
+              echo "❌ PRs to master or release/* must come from story/RBAUAA-* or release/* branches."
+              exit 1
+            fi
+          fi
+
+          # Use Case 2: PR to story/RBAUAA-XXXXX must come from feature/RBAUAA-XXXXX
+          if [[ "$TARGET_BRANCH" =~ ^story/RBAUAA-[0-9]+$ ]]; then
+            # Extract ticket number from target
+            TICKET_ID=$(echo "$TARGET_BRANCH" | grep -oE "RBAUAA-[0-9]+")
+            if [[ "$SOURCE_BRANCH" == "feature/$TICKET_ID" ]]; then
+              echo "✅ Use Case 2 passed."
+            else
+              echo "❌ PRs to story/$TICKET_ID must come from feature/$TICKET_ID."
+              exit 1
+            fi
+          fi
+
+          echo "✅ Branch validation completed successfully."

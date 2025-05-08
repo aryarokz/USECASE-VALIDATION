@@ -1,19 +1,39 @@
-name: Validate PR Branch Namings
+name: PR Branch Rules Check
 
 on:
   pull_request:
     types: [opened, reopened, synchronize, edited]
 
+concurrency:
+  group: 'pr-branch-validation'
+  cancel-in-progress: false
+
 jobs:
-  enforce-branch-rules:
+  check-branch:
+    name: Enforce PR Branch Rules
     runs-on: ubuntu-latest
+    outputs:
+      is-valid: ${{ steps.validate.outputs.is-valid }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Validate PR Branch Rules
-        uses: ./.github/actions/pr-branch-validator/action.yaml
+        uses: ./.github/actions/pr-branch-validator
+        id: validate
         with:
           source: ${{ github.head_ref }}
           target: ${{ github.base_ref }}
 
+  # reject-if-invalid:
+  #   name: Reject Invalid PR Branches
+  #   runs-on: ubuntu-latest
+  #   needs: [check-branch]
+  #   if: ${{ needs.check-branch.outputs.is-valid != 'true' }}
+  #   steps:
+  #     - name: Fail the job
+  #       run: |
+  #         echo "❌ PR source/target branches do not follow the allowed rules. Rejecting."
+  #         exit 1

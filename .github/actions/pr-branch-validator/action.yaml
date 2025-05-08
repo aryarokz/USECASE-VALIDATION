@@ -24,7 +24,7 @@ runs:
         script: |
           const source = '${{ inputs.source }}';
           const target = '${{ inputs.target }}';
-          console.log(`🔍 Validating PR from '${source}' → '${target}'`);
+          console.log(`Validating PR from '${source}' → '${target}'`);
 
           let valid = false;
 
@@ -44,7 +44,7 @@ runs:
           }
 
           if (!valid) {
-            core.setFailed(`❌ Invalid PR: '${source}' → '${target}' is not allowed by branching rules.`);
+            core.setFailed(`Invalid PR: '${source}' → '${target}' is not allowed by branching rules.`);
           }
 
           core.setOutput('valid', valid.toString());

@@ -1,3 +1,5 @@
+#.github/actions/pr-branch-validator/action.yaml
+
 name: Validate PR Branch Strategy
 description: story-based branching validations
 

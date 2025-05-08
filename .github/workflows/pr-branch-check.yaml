@@ -1,19 +1,30 @@
-name: Validate PR Branch Namings
+# .github/workflows/pr-branch-check.yaml
+
+name: PR Branch Rules Check
 
 on:
   pull_request:
     types: [opened, reopened, synchronize, edited]
 
+concurrency:
+  group: 'pr-branch-validation'
+  cancel-in-progress: false
+
 jobs:
-  enforce-branch-rules:
-    runs-on: ubuntu-latest
+  check-branch:
+    name: Enforce PR Branch Rules
+    runs-on: ripper-light-nodejs
+    outputs:
+      is-valid: ${{ steps.validate.outputs.is-valid }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Validate PR Branch Rules
-        uses: ./.github/actions/pr-branch-validator/action.yaml
+        uses: ./.github/actions/pr-branch-validator
+        id: validate
         with:
           source: ${{ github.head_ref }}
           target: ${{ github.base_ref }}
-

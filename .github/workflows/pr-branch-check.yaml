@@ -8,6 +8,9 @@ jobs:
   enforce-branch-rules:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Validate PR Branch Rules
         uses: ./.github/actions/pr-branch-validator
         with:

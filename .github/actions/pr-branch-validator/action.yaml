@@ -1,5 +1,5 @@
 name: Validate PR Branch Strategy
-description: Enforces business-oriented PR branch rules based on story/feature/release prefixes.
+description: story-based branching validations
 
 inputs:
   source:

@@ -1,4 +1,4 @@
-name: Validate PR Branch Naming
+name: Validate PR Branch Namings
 
 on:
   pull_request:
@@ -12,7 +12,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate PR Branch Rules
-        uses: ./.github/actions/pr-branch-validator
+        uses: ./.github/actions/pr-branch-validator/action.yaml
         with:
           source: ${{ github.head_ref }}
           target: ${{ github.base_ref }}
+

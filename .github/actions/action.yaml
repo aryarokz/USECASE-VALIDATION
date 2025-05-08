@@ -1,0 +1,50 @@
+name: Validate PR Branch Strategy
+description: Enforces business-oriented PR branch rules based on story/feature/release prefixes.
+
+inputs:
+  source:
+    description: Source branch (head_ref)
+    required: true
+  target:
+    description: Target branch (base_ref)
+    required: true
+
+outputs:
+  valid:
+    description: Whether PR is valid
+    value: ${{ steps.check.outputs.valid }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Check PR branch rules
+      id: check
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const source = '${{ inputs.source }}';
+          const target = '${{ inputs.target }}';
+          console.log(`🔍 Validating PR from '${source}' → '${target}'`);
+
+          let valid = false;
+
+          // Use Case 1
+          if (/^(master|release\/\d+)$/.test(target)) {
+            if (/^story\/RBAUAA-\d+$/.test(source) || /^release\/\d+$/.test(source)) {
+              valid = true;
+            }
+          }
+
+          // Use Case 2
+          else if (/^story\/RBAUAA-\d+$/.test(target)) {
+            const ticket = target.split('/')[1];
+            if (source === `feature/${ticket}`) {
+              valid = true;
+            }
+          }
+
+          if (!valid) {
+            core.setFailed(`❌ Invalid PR: '${source}' → '${target}' is not allowed by branching rules.`);
+          }
+
+          core.setOutput('valid', valid.toString());

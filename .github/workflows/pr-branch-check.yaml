@@ -1,3 +1,5 @@
+# .github/workflows/pr-branch-check.yaml
+
 name: PR Branch Rules Check
 
 on:
@@ -11,7 +13,7 @@ concurrency:
 jobs:
   check-branch:
     name: Enforce PR Branch Rules
-    runs-on: ubuntu-latest
+    runs-on: ripper-light-nodejs
     outputs:
       is-valid: ${{ steps.validate.outputs.is-valid }}
     steps:
@@ -26,14 +28,3 @@ jobs:
         with:
           source: ${{ github.head_ref }}
           target: ${{ github.base_ref }}
-
-  # reject-if-invalid:
-  #   name: Reject Invalid PR Branches
-  #   runs-on: ubuntu-latest
-  #   needs: [check-branch]
-  #   if: ${{ needs.check-branch.outputs.is-valid != 'true' }}
-  #   steps:
-  #     - name: Fail the job
-  #       run: |
-  #         echo "❌ PR source/target branches do not follow the allowed rules. Rejecting."
-  #         exit 1
